@@ -100,7 +100,7 @@ export class OrdersStatelessStack extends cdk.Stack {
     const orderIdResource = orderResource.addResource('{id}');
     orderResource.addMethod('POST', new apigw.LambdaIntegration(createOrderLambda));
     orderResource.addMethod('GET', new apigw.LambdaIntegration(listOrderLambda));
-    orderIdResource.addMethod('POST', new apigw.LambdaIntegration(updateOrderLambda));
+    orderIdResource.addMethod('PUT', new apigw.LambdaIntegration(updateOrderLambda));
     orderIdResource.addMethod('DELETE', new apigw.LambdaIntegration(deleteOrderLambda));
     orderIdResource.addMethod('GET', new apigw.LambdaIntegration(getOrderLambda));
   }

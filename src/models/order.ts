@@ -1,5 +1,5 @@
 import { OrderStatus } from '../types';
-import { OrderDTO, OrderLineDTO } from '../dto/order-dto';
+import { OrderDTO, OrderLineDTO, UpdateOrderDTO } from '../dto/order-dto';
 import { v4 as uuid } from 'uuid';
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
@@ -43,7 +43,7 @@ export class Order {
     readonly createdBy: string;
     readonly status: OrderStatus;
     readonly totalAmount: number;
-    readonly orderLines: OrderLine[];
+    orderLines?: OrderLine[];
     readonly branchId: string;
     readonly comments: string;
 
@@ -53,11 +53,11 @@ export class Order {
         this.createdDateTime = orderDTO.createdDateTime ?? new Date().toISOString();
         this.updatedDateTime = orderDTO.updatedDateTime ?? new Date().toISOString();
         this.createdBy = orderDTO.createdBy;
-        this.status = orderDTO.status ?? OrderStatus.PENDING;
+        this.status = orderDTO.status as OrderStatus ?? OrderStatus.PENDING;
         this.orderLines = (orderDTO.orderLines ?? []).map(orderLineDto => OrderLine.fromDTO(orderLineDto));
         this.branchId = orderDTO.branchId;
         this.comments = orderDTO.comments ?? '';
-        this.totalAmount = this.orderLines.reduce((accumulator, orderLine) => accumulator + orderLine.total, 0);
+        this.totalAmount = orderDTO.totalAmount ?? this.orderLines.reduce((accumulator, orderLine) => accumulator + orderLine.total, 0);
     }
 
     validate(): boolean {

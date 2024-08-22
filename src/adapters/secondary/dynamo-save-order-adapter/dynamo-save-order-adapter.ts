@@ -3,14 +3,14 @@ import {
   TransactWriteItemsCommand,
 } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
-import { Order, OrderLine } from '../../models/order';
-import { logger } from '../../utils/logger';
+import { Order, OrderLine } from '../../../models/order';
+import { logger } from '../../../utils/logger';
 const client = new DynamoDBClient();
 
 const tableName = process.env.TABLE_NAME;
 
 export const saveOrder = async (order: Order) => {
-  const items = [convertOrder(order), ...convertOrderLine(order.id, order.orderLines)];
+  const items = [convertOrder(order), ...convertOrderLine(order.id, order.orderLines!)];
   logger.debug('Items are: ',  {items});
   const transactWriteItemsCommand = new TransactWriteItemsCommand({TransactItems: items});
   logger.debug('Transaction write is: ',  {transactWriteItemsCommand});
@@ -28,8 +28,8 @@ const convertOrder = (order: Order) => {
   delete orderCopy.orderLines;
   return {
     Put: {
-      Item: marshall({PK: `ORDER#${order.id}`,
-      SK: `DETAIL`, ...orderCopy}, {convertClassInstanceToMap:true}),
+      Item: marshall({PK: `ORDER`,
+      SK: `ID#${order.id}`, ...orderCopy}, {convertClassInstanceToMap:true}),
       TableName: tableName,
     },
   };
@@ -39,8 +39,8 @@ const convertOrderLine = (orderId: string, orderLines: OrderLine[]) => {
   return orderLines.map((orderLine) => {
     return {
       Put: {
-        Item: marshall({PK: `ORDER#${orderId}`,
-        SK: `LINE#${orderLine.id}`, ...orderLine}, {convertClassInstanceToMap:true}),
+        Item: marshall({PK: `ORDER_LINE`,
+        SK: `ORDER_ID#${orderId}#LINE_ID#${orderLine.id}`, ...orderLine}, {convertClassInstanceToMap:true}),
         TableName: tableName,
       },
     };

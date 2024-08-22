@@ -18,11 +18,8 @@ export const handler = async (
     const newOrder = Order.fromDTO(JSON.parse(event.body!));
     const order = await createOrder(newOrder);
     const response = {
-        statusCode: 200,
-        body: JSON.stringify({
-            message: JSON.stringify(order),
-            input: event,
-        }),
+        statusCode: 201,
+        body: JSON.stringify(order),
     };
 
     return response;
